@@ -33,14 +33,19 @@ namespace TetrisClone
         #endregion
 
         #region Properties
-
+        public int CellWidth
+        {
+            get { return _cellWidth; }
+            set { _cellWidth = value; }
+        }
         #endregion
 
         #region Methods
         public void Render()
         {
             Vector offset;
-            Point2D renderPosition, startPosition = SwinGame.PointAt(0, 0);
+            Matrix2D scale = SwinGame.ScaleMatrix(GameConfig.GameScale);
+            Point2D renderPosition, startPosition = scale.Multiply(SwinGame.PointAt(0, 0));
 
             for (int row = 0; row < _cells.Length; ++row)
             {
