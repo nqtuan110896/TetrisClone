@@ -8,10 +8,6 @@ namespace TetrisClone
 {
     public class TetrominoI : Tetromino
     {
-        #region Fields
-
-        #endregion
-
         #region Constructors
         public TetrominoI(int startRow, int startCol, int cellWidth) : base(startRow, startCol, cellWidth)
         {
