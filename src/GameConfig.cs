@@ -21,9 +21,9 @@ namespace TetrisClone
         #region Constructors
         static GameConfig()
         {
-            _background = new Lazy<Color>(() => { return SwinGame.RGBColor(240, 240, 240); });
+            _background = new Lazy<Color>(() => { return SwinGame.RGBColor(16, 16, 16); });
             _backgroundInactive = new Lazy<Color>(() => { return SwinGame.RGBAColor(Background.R, Background.G, Background.B, 64); });
-            _foreground = new Lazy<Color>(() => { return SwinGame.RGBColor(16, 16, 16); });
+            _foreground = new Lazy<Color>(() => { return SwinGame.RGBColor(240, 240, 240); });
             _foregroundInactive = new Lazy<Color>(() => { return SwinGame.RGBAColor(Foreground.R, Foreground.G, Foreground.B, 64); });
 
             GameScale = 1.0f;

@@ -9,11 +9,11 @@ namespace TetrisClone
     public class TetrominoI : Tetromino
     {
         #region Constructors
-        public TetrominoI(int startRow, int startCol, int cellWidth) : base(startRow, startCol, cellWidth)
+        public TetrominoI(int startRow, int startCol, Point2D basePosition, int cellWidth) : base(startRow, startCol, basePosition, cellWidth)
         {
-            _background = SwinGame.RGBColor(0, 255, 255);
-            _foreground = GameConfig.Background;
-            for (int row = 0; row < _cells.Length; ++row) _cells[row][1] = 1;
+            Background = SwinGame.RGBColor(0, 255, 255);
+            Foreground = GameConfig.Background;
+            for (int col = 0; col < TotalColumn; ++col) _cells[1][col] = 1;
         }
         #endregion
     }
