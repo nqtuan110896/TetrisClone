@@ -70,6 +70,12 @@
     <Compile Include="src\GameMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Tetromino.cs" />
+    <Compile Include="src\TetrominoL.cs" />
+    <Compile Include="src\TetrominoJ.cs" />
+    <Compile Include="src\TetrominoZ.cs" />
+    <Compile Include="src\TetrominoS.cs" />
+    <Compile Include="src\TetrominoT.cs" />
+    <Compile Include="src\TetrominoO.cs" />
     <Compile Include="src\TetrominoI.cs" />
   </ItemGroup>
   <ItemGroup>

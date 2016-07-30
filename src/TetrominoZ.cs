@@ -6,17 +6,17 @@ using SwinGameSDK;
 
 namespace TetrisClone
 {
-    public class TetrominoI : Tetromino
+    public class TetrominoZ : Tetromino
     {
         #region Constructors
-        public TetrominoI(int startRow, int startCol, Point2D basePosition, int cellWidth) : base(startRow, startCol, basePosition, cellWidth)
+        public TetrominoZ(int startRow, int startCol, Point2D basePosition, int cellWidth) : base(startRow, startCol, basePosition, cellWidth)
         {
-            _background = SwinGame.RGBColor(0, 255, 255);
+            _background = SwinGame.RGBColor(255, 0, 0);
 
             _cells = new int[TotalRow, TotalColumn]
             {
-                {0, 0, 0, 0},
-                {1, 1, 1, 1},
+                {7, 7, 0, 0},
+                {0, 7, 7, 0},
                 {0, 0, 0, 0},
                 {0, 0, 0, 0}
             };
@@ -33,8 +33,8 @@ namespace TetrisClone
                 case 3:
                     tmp = new int[TotalRow, TotalColumn]
                     {
-                        {0, 0, 0, 0},
-                        {1, 1, 1, 1},
+                        {7, 7, 0, 0},
+                        {0, 7, 7, 0},
                         {0, 0, 0, 0},
                         {0, 0, 0, 0}
                     };
@@ -42,10 +42,10 @@ namespace TetrisClone
                 default: // case 0, case 2
                     tmp = new int[TotalRow, TotalColumn]
                     {
-                        {0, 1, 0, 0},
-                        {0, 1, 0, 0},
-                        {0, 1, 0, 0},
-                        {0, 1, 0, 0}
+                        {0, 0, 7, 0},
+                        {0, 7, 7, 0},
+                        {0, 7, 0, 0},
+                        {0, 0, 0, 0}
                     };
                     break;
             }

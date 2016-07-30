@@ -12,42 +12,37 @@ namespace TetrisClone
         public const int TotalColumn = 4;
         public const int TotalRow = 4;
         
-        public static uint FallTime = 500u;
+        public static uint MaxFallDelay = 500u;
 
+        protected Color _background;
         protected Point2D _basePosition;
-        protected int[][] _cells;
+        protected int[,] _cells;
         protected int _cellWidth;
         protected int _currentColumn;
+        protected uint _currentFallDelay;
         protected int _currentRow;
-        protected uint _fallDelay;
+        protected Color _foreground;
+        protected int _rotationStage;
         #endregion
 
         #region Constructors
-        public Tetromino(int startRow, int startCol, Point2D basePosition, int cellWidth)
+        protected Tetromino(int startRow, int startCol, Point2D basePosition, int cellWidth)
         {
             _basePosition = basePosition;
             _cellWidth = cellWidth;
-            _cells = new int[TotalRow][];
-            for (int row = 0; row < TotalRow; ++row)
-            {
-                _cells[row] = new int[TotalColumn];
-                for (int col = 0; col < TotalColumn; ++col) _cells[row][col] = 0;
-            }
             _currentColumn = startCol;
+            _currentFallDelay = 0u;
             _currentRow = startRow;
-            _fallDelay = 0u;
+            _foreground = GameConfig.Background;
+            _rotationStage = 0;
         }
         #endregion
 
         #region Properties
-        public static Color Background
+        public Color Background
         {
-            get; set;
-        }
-
-        public static Color Foreground
-        {
-            get; set;
+            get { return _background; }
+            set { _background = value; }
         }
 
         public Point2D BasePosition
@@ -61,6 +56,44 @@ namespace TetrisClone
             get { return _cellWidth; }
             set { _cellWidth = value; }
         }
+
+        public int CurrentColumn
+        {
+            get { return _currentColumn; }
+            set { _currentColumn = value; }
+        }
+
+        public uint CurrentFallDelay
+        {
+            get { return _currentFallDelay; }
+            set { _currentFallDelay = value; }
+        }
+
+        public int CurrentRow
+        {
+            get { return _currentRow; }
+            set { _currentRow = value; }
+        }
+
+        public Color Foreground
+        {
+            get { return _foreground; }
+            set { _foreground = value; }
+        }
+
+        public int RotationStage
+        {
+            get { return _rotationStage; }
+            set { _rotationStage = value; }
+        }
+        #endregion
+
+        #region Indexers
+        public int this[int row, int col]
+        {
+            get { return _cells[row, col]; }
+            set { _cells[row, col] = value; }
+        }
         #endregion
 
         #region Methods
@@ -70,10 +103,10 @@ namespace TetrisClone
             {
                 for (int col = 0; col < TotalColumn; ++col)
                 {
-                    if (_cells[row][col] != 0)
+                    if (_cells[row, col] != 0)
                     {
                         if (_currentRow + row + 1 >= Board.TotalRow) return false;
-                        else if (board[_currentRow + row + 1][_currentColumn + col] != 0) return false;
+                        else if (board[_currentRow + row + 1, _currentColumn + col] != 0) return false;
                     }
                 }
             }
@@ -86,10 +119,10 @@ namespace TetrisClone
             {
                 for (int col = 0; col < TotalColumn; ++col)
                 {
-                    if (_cells[row][col] != 0)
+                    if (_cells[row, col] != 0)
                     {
                         if (_currentColumn + col - 1 < 0) return false;
-                        else if (board[_currentRow + row][_currentColumn + col - 1] != 0) return false;
+                        else if (board[_currentRow + row, _currentColumn + col - 1] != 0) return false;
                     }
                 }
             }
@@ -102,10 +135,10 @@ namespace TetrisClone
             {
                 for (int col = 0; col < TotalColumn; ++col)
                 {
-                    if (_cells[row][col] != 0)
+                    if (_cells[row, col] != 0)
                     {
                         if (_currentColumn + col + 1 >= Board.TotalColumn) return false;
-                        else if (board[_currentRow + row][_currentColumn + col + 1] != 0) return false;
+                        else if (board[_currentRow + row, _currentColumn + col + 1] != 0) return false;
                     }
                 }
             }
@@ -118,10 +151,10 @@ namespace TetrisClone
             {
                 for (int col = 0; col < TotalColumn; ++col)
                 {
-                    if (_cells[row][col] != 0)
+                    if (_cells[row, col] != 0)
                     {
                         if (_currentRow + row - 1 < 0) return false;
-                        else if (board[_currentRow + row - 1][_currentColumn + col] != 0) return false;
+                        else if (board[_currentRow + row - 1, _currentColumn + col] != 0) return false;
                     }
                 }
             }
@@ -135,11 +168,11 @@ namespace TetrisClone
 
         public void Fall(float speed = 1.0f)
         {
-            _fallDelay += Convert.ToUInt32(speed * GameMain.DeltaTime);
-            if (_fallDelay >= FallTime)
+            _currentFallDelay += Convert.ToUInt32(speed * GameMain.DeltaTime);
+            if (_currentFallDelay >= MaxFallDelay)
             {
                 MoveDown();
-                _fallDelay = 0u;
+                _currentFallDelay = 0u;
             }
         }
 
@@ -149,7 +182,7 @@ namespace TetrisClone
             {
                 for (int col = 0; col < TotalColumn; ++col)
                 {
-                    if (_cells[row][col] != 0) board[row + _currentRow][col + _currentColumn] = _cells[row][col];
+                    if (_cells[row, col] != 0) board[row + _currentRow, col + _currentColumn] = _cells[row, col];
                 }
             }
         }
@@ -185,54 +218,128 @@ namespace TetrisClone
                 {
                     offset = SwinGame.VectorTo(Convert.ToSingle((_currentColumn + col) * _cellWidth), Convert.ToSingle((_currentRow + row) * _cellWidth));
                     renderPosition = _basePosition.Add(offset);
-                    if (_cells[row][col] != 0)
+                    if (_cells[row, col] != 0)
                     {
-                        SwinGame.FillRectangle(Background, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
-                        SwinGame.DrawRectangle(Foreground, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
+                        SwinGame.FillRectangle(_background, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
                     }
+                    SwinGame.DrawRectangle(_foreground, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
                 }
             }
-        }
-
-        public void Rotate(Board board, string direction = "Clockwise")
-        {
-            while (!TryRotate(board, direction))
-            {
-                // Try performing necessary wall kicks
-                if (CanMoveRight(board)) MoveRight();
-                else if (CanMoveLeft(board)) MoveLeft();
-            }
-        }
-
-        public bool TryRotate(Board board, string direction)
-        {
-            if (_currentColumn < 0 || _currentColumn + TotalColumn > Board.TotalColumn) return false;
-            else if (_currentRow + TotalRow > Board.TotalRow) return false;
-
-            int[][] tmp = new int[TotalRow][];
-            for (int row = 0; row < TotalRow; ++row)
-            {
-                tmp[row] = new int[TotalColumn];
-                for (int col = 0; col < TotalColumn; ++col)
-                {
-                    if (direction.ToLower() == "counterclockwise") tmp[row][col] = _cells[col][_cells.GetUpperBound(0) - row];
-                    else tmp[row][col] = _cells[_cells.GetUpperBound(0) - col][row]; // Default rotation direction is Clockwise
-
-                    if (board[_currentRow + row][_currentColumn + col] != 0 && tmp[row][col] != 0) return false;
-                }
-            }
-            _cells = tmp;
-            return true;
         }
 
         public void RotateClockwise(Board board)
         {
-            Rotate(board);
+            if (TryRotateClockwise(board))
+            {
+                _rotationStage++;
+                return;
+            }
+
+            if (CanMoveRight(board))
+            {
+                MoveRight();
+                if (TryRotateClockwise(board))
+                {
+                    _rotationStage++;
+                    return;
+                }
+
+                if (CanMoveRight(board))
+                {
+                    MoveRight();
+                    if (TryRotateClockwise(board))
+                    {
+                        _rotationStage++;
+                        return;
+                    }
+                    MoveLeft();
+                }
+                MoveLeft();
+            }
+
+            if (CanMoveLeft(board))
+            {
+                MoveLeft();
+                if (TryRotateClockwise(board))
+                {
+                    _rotationStage++;
+                    return;
+                }
+
+                if (CanMoveLeft(board))
+                {
+                    MoveLeft();
+                    if (TryRotateClockwise(board))
+                    {
+                        _rotationStage++;
+                        return;
+                    }
+                    MoveRight();
+                }
+                MoveRight();
+            }
         }
 
         public void RotateCounterClockwise(Board board)
         {
-            Rotate(board, "CounterClockwise");
+            if (TryRotateCounterClockwise(board))
+            {
+                _rotationStage--;
+                return;
+            }
+
+            if (CanMoveLeft(board))
+            {
+                MoveLeft();
+                if (TryRotateCounterClockwise(board))
+                {
+                    _rotationStage--;
+                    return;
+                }
+
+                if (CanMoveLeft(board))
+                {
+                    MoveLeft();
+                    if (TryRotateCounterClockwise(board))
+                    {
+                        _rotationStage--;
+                        return;
+                    }
+                    MoveRight();
+                }
+                MoveRight();
+            }
+
+            if (CanMoveRight(board))
+            {
+                MoveRight();
+                if (TryRotateCounterClockwise(board))
+                {
+                    _rotationStage--;
+                    return;
+                }
+
+                if (CanMoveRight(board))
+                {
+                    MoveRight();
+                    if (TryRotateCounterClockwise(board))
+                    {
+                        _rotationStage--;
+                        return;
+                    }
+                    MoveLeft();
+                }
+                MoveLeft();
+            }
+        }
+
+        public abstract bool TryRotateClockwise(Board board);
+        public abstract bool TryRotateCounterClockwise(Board board);
+
+        public void Update()
+        {
+            if (_rotationStage < 0) _rotationStage += 4;
+            else if (_rotationStage > 3) _rotationStage -= 4;
         }
         #endregion
     }
