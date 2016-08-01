@@ -65,6 +65,27 @@ namespace TetrisClone
         #endregion
 
         #region Methods
+        public bool CanClearRow(int rowToClear)
+        {
+            for (int col = 0; col < TotalColumn; ++col)
+            {
+                if (_cells[rowToClear, col] == 0) return false;
+            }
+            return true;
+        }
+
+        public void ClearRow(int rowToClear)
+        {
+            for (int col = 0; col < TotalColumn; ++col)
+            {
+                for (int row = rowToClear; row > 0; --row)
+                {
+                    _cells[row, col] = _cells[row - 1, col];
+                }
+                _cells[0, col] = 0;
+            }
+        }
+
         public void Render()
         {
             Color cellBackground;
@@ -107,6 +128,14 @@ namespace TetrisClone
                     SwinGame.FillRectangle(cellBackground, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
                     SwinGame.DrawRectangle(_foreground, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
                 }
+            }
+        }
+
+        public void Update()
+        {
+            for (int row = 0; row < TotalRow; ++row)
+            {
+                if (CanClearRow(row)) ClearRow(row);
             }
         }
         #endregion

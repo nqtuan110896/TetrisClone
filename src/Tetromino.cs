@@ -221,8 +221,8 @@ namespace TetrisClone
                     if (_cells[row, col] != 0)
                     {
                         SwinGame.FillRectangle(_background, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
+                        SwinGame.DrawRectangle(_foreground, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
                     }
-                    SwinGame.DrawRectangle(_foreground, SwinGame.RectangleFrom(renderPosition, _cellWidth, _cellWidth));
                 }
             }
         }

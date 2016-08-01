@@ -35,6 +35,13 @@ namespace TetrisClone
         #endregion
 
         #region Methods
+        public static Board CreateBoard()
+        {
+            int cellWidth = 32;
+            Point2D basePosition = SwinGame.PointAt(GameConfig.ScreenWidth / 2.0f - Board.TotalColumn / 2 * cellWidth, GameConfig.ScreenHeight / 2.0f - (Board.TotalRow / 2 + 1) * cellWidth);
+            return new Board(basePosition, cellWidth);
+        }
+
         public static Tetromino CreateRandomTetromino()
         {
             Random rng = new Random();
@@ -45,8 +52,8 @@ namespace TetrisClone
         {
             int rowOnBoard = 0;
             int columnOnBoard = 3;
-            int cellWidth = 36;
-            Point2D basePosition = SwinGame.PointAt(GameConfig.ScreenWidth / 2.0f - 5.0f * cellWidth, -2.0f * cellWidth);
+            int cellWidth = 32;
+            Point2D basePosition = SwinGame.PointAt(GameConfig.ScreenWidth / 2.0f - Board.TotalColumn / 2 * cellWidth, GameConfig.ScreenHeight / 2.0f - (Board.TotalRow / 2 + 1) * cellWidth);
             switch (tetrominoType)
             {
                 case 1: return new TetrominoJ(rowOnBoard, columnOnBoard, basePosition, cellWidth);
@@ -55,7 +62,8 @@ namespace TetrisClone
                 case 4: return new TetrominoS(rowOnBoard, columnOnBoard, basePosition, cellWidth);
                 case 5: return new TetrominoT(rowOnBoard, columnOnBoard, basePosition, cellWidth);
                 case 6: return new TetrominoZ(rowOnBoard, columnOnBoard, basePosition, cellWidth);
-                default: return new TetrominoI(rowOnBoard, columnOnBoard, basePosition, cellWidth); // case 0
+                default: // case 0
+                    return new TetrominoI(rowOnBoard, columnOnBoard, basePosition, cellWidth); // case 0
             }
         }
 
@@ -66,15 +74,13 @@ namespace TetrisClone
             if (SwinGame.KeyTyped(KeyCode.vk_f)) SwinGame.ToggleFullScreen(); ;
             if (SwinGame.KeyTyped(KeyCode.vk_e)) _tetromino.RotateClockwise(_board);
             else if (SwinGame.KeyTyped(KeyCode.vk_q)) _tetromino.RotateCounterClockwise(_board);
-            if (SwinGame.KeyTyped(KeyCode.vk_e)) Console.WriteLine(_tetromino.RotationStage);
-            else if (SwinGame.KeyTyped(KeyCode.vk_q)) Console.WriteLine(_tetromino.RotationStage);
 
             if (SwinGame.KeyTyped(KeyCode.vk_UP))
             {
                 while (_tetromino.CanMoveDown(_board)) _tetromino.Fall();
-                _currentLockDelay = MaxLockDelay / 2;
+                _currentLockDelay = MaxLockDelay;
             }
-            else if (SwinGame.KeyTyped(KeyCode.vk_DOWN) && _tetromino.CanMoveDown(_board)) _tetromino.Drop();
+            else if (SwinGame.KeyDown(KeyCode.vk_DOWN) && _tetromino.CanMoveDown(_board)) _tetromino.Drop();
             else if (SwinGame.KeyDown(KeyCode.vk_SPACE) && _tetromino.CanMoveUp(_board)) _tetromino.MoveUp();
 
             if (SwinGame.KeyTyped(KeyCode.vk_LEFT) && _tetromino.CanMoveLeft(_board)) _tetromino.MoveLeft();
@@ -84,8 +90,7 @@ namespace TetrisClone
         public static void InitialiseComponents()
         {
             SwinGame.OpenGraphicsWindow(GameConfig.GameNameWithVersion(), GameConfig.ScreenWidth, GameConfig.ScreenHeight);
-            // cellWidth, currently set to 36
-            _board = new Board(SwinGame.PointAt(GameConfig.ScreenWidth / 2.0f - 5.0f * 36, -2.0f * 36), 36);
+            _board = CreateBoard();
             _tetromino = CreateRandomTetromino();
 
             MaxLockDelay = 1000u;
@@ -127,6 +132,8 @@ namespace TetrisClone
 
         public static void Update()
         {
+            _board.Update();
+
             if (_tetromino.CanMoveDown(_board))
             {
                 _currentLockDelay = 0u;
@@ -143,6 +150,7 @@ namespace TetrisClone
                 }
             }
             _tetromino.Update();
+
             LastFrameTime = _timer.Ticks;
         }
         #endregion
